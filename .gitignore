@@ -11,6 +11,8 @@ dist/
 # IDE
 .vscode/
 .idea/
+.cursor/
+.claude/
 *.swp
 *.swo
 

@@ -1,5 +1,5 @@
 import { TranscriptResponse } from "../core/types.js";
-import { enhanceTranscriptWithAI } from "./summarize.js";
+import { enhanceTranscriptWithAI } from "./utils.js";
 
 type EnhanceTranscriptRequest = {
   action: "enhanceTranscript";

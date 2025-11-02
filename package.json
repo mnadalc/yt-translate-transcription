@@ -1,0 +1,25 @@
+{
+  "name": "chrome-extension",
+  "version": "1.0.0",
+  "description": "YouTube Transcript Translator Chrome Extension",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "chrome-extension",
+    "youtube",
+    "transcript",
+    "translation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "devDependencies": {
+    "chrome-types": "^0.1.384",
+    "esbuild": "^0.25.11",
+    "typescript": "^5.9.3"
+  }
+}

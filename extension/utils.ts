@@ -181,12 +181,14 @@ export function getElement<T extends HTMLElement>(
  * @param {"info" | "error" | "success"} type - The type of the status to set.
  * @param {string} message - The message to set the status to.
  */
-export function setStatus(type: "info" | "error" | "success", message: string) {
-  const statusContainer = getElement("#status", HTMLDivElement);
-
-  statusContainer.textContent = message;
-  statusContainer.className = `status ${type}`;
-  statusContainer.classList.remove("hidden");
+export function setStatus(
+  element: HTMLDivElement,
+  type: "info" | "error" | "success",
+  message: string
+) {
+  element.textContent = message;
+  element.className = `status ${type}`;
+  element.classList.remove("hidden");
 }
 
 /**

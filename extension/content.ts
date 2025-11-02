@@ -1,11 +1,20 @@
 /// <reference types="chrome-types" />
 
 import { TranscriptResponse } from "./types";
-import { getTranscriptButton } from "./utils";
+import { getTranscriptButton, HF_ENDPOINT } from "./utils";
+
+type ChromeRuntimeRequest =
+  | {
+      action: "getTranscript";
+    }
+  | {
+      action: "enhanceTranscript";
+      transcript: string;
+    };
 
 chrome.runtime.onMessage.addListener(
   (
-    request: { action: "getTranscript" },
+    request: ChromeRuntimeRequest,
     _sender: chrome.runtime.MessageSender,
     sendResponse: (response: TranscriptResponse) => void
   ): boolean => {
@@ -19,6 +28,22 @@ chrome.runtime.onMessage.addListener(
           sendResponse({
             success: false,
             error: error.message || "Failed to extract transcript",
+          });
+        });
+
+      return true;
+    }
+
+    if (request.action === "enhanceTranscript") {
+      enhanceTranscriptWithAI(request.transcript)
+        .then((enhancedTranscript) => {
+          sendResponse({ success: true, transcript: enhancedTranscript });
+          return enhancedTranscript;
+        })
+        .catch((error) => {
+          sendResponse({
+            success: false,
+            error: error.message || "Failed to enhance transcript",
           });
         });
 
@@ -156,6 +181,36 @@ async function getTranscriptFromDOM(): Promise<string | null> {
   } catch (error) {
     console.error("Error extracting from DOM:", error);
     return null;
+  }
+}
+
+async function enhanceTranscriptWithAI(transcript: string): Promise<string> {
+  try {
+    const response = await fetch(HF_ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify({ inputs: transcript }),
+    });
+
+    console.log(
+      "%cEnhanced transcript:",
+      "background-color: green; color: white",
+      await response.json()
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to enhance transcript with AI");
+    }
+
+    const data = await response.json();
+    console.log(
+      "%cEnhanced transcript:",
+      "background-color: green; color: white",
+      data.enhancedTranscript
+    );
+    return data.enhancedTranscript;
+  } catch (error) {
+    console.error("Error enhancing transcript with AI:", error);
+    throw error;
   }
 }
 

@@ -64,6 +64,11 @@ transcriptButton.addEventListener("click", async () => {
     setStatus(statusElement, "info", "Translating transcript...");
 
     const targetLang = languageSelect.value;
+    console.log(
+      "%cTarget language:",
+      "background-color: green; color: white",
+      response.transcript
+    );
     const translatedText = await translateText(response.transcript, targetLang);
 
     transcriptContent.textContent = translatedText;

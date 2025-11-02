@@ -212,6 +212,7 @@ export async function translateText(
 
     const translatedChunks: string[] = [];
 
+    console.log("%cChunks:", "background-color: green; color: white", chunks);
     for (const chunk of chunks) {
       const encodedText = encodeURIComponent(chunk);
       const response = await fetch(
@@ -222,6 +223,11 @@ export async function translateText(
       translatedChunks.push(data[0][0][0]);
     }
 
+    console.log(
+      "%cTranslated chunks:",
+      "background-color: green; color: white",
+      translatedChunks.join(" ")
+    );
     return translatedChunks.join(" ");
   } catch (error) {
     console.error("Translation error:", error);

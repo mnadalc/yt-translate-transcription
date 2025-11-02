@@ -188,26 +188,45 @@ async function enhanceTranscriptWithAI(transcript: string): Promise<string> {
   try {
     const response = await fetch(HF_ENDPOINT, {
       method: "POST",
-      body: JSON.stringify({ inputs: transcript }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: transcript,
+        parameters: {
+          max_length: 150,
+          min_length: 30,
+          do_sample: false,
+        },
+      }),
     });
 
-    console.log(
-      "%cEnhanced transcript:",
-      "background-color: green; color: white",
-      await response.json()
-    );
-
     if (!response.ok) {
-      throw new Error("Failed to enhance transcript with AI");
+      if (response.status === 429) {
+        const resetTime = response.headers.get("x-ratelimit-reset");
+        const resetDate = resetTime ? new Date(parseInt(resetTime) * 1000) : null;
+        const resetMsg = resetDate
+          ? `Try again after ${resetDate.toLocaleTimeString()}`
+          : "Try again later";
+        throw new Error(`Rate limit exceeded. ${resetMsg}`);
+      }
+
+      if (response.status === 503) {
+        throw new Error("Model is loading. Please wait 20 seconds and try again");
+      }
+
+      const errorText = await response.text();
+      throw new Error(`API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
     console.log(
       "%cEnhanced transcript:",
       "background-color: green; color: white",
-      data.enhancedTranscript
+      data
     );
-    return data.enhancedTranscript;
+
+    return data[0].summary_text;
   } catch (error) {
     console.error("Error enhancing transcript with AI:", error);
     throw error;

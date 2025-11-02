@@ -1,5 +1,6 @@
 export const HF_ENDPOINT =
   "https://api-inference.huggingface.co/models/facebook/bart-large-cnn";
+const MAX_CHUNK_SIZE = 500;
 
 /**
  * Mapping of language codes to localized "Show transcript" button labels.
@@ -192,6 +193,64 @@ export function setStatus(
 }
 
 /**
+ * Splits text into chunks at sentence boundaries while respecting max size.
+ *
+ * @param {string} text - The text to chunk.
+ * @param {number} MAX_CHUNK_SIZE - Maximum size of each chunk in characters.
+ * @returns {string[]} Array of text chunks.
+ */
+function smartChunkText(text: string): string[] {
+  const chunks: string[] = [];
+
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+
+  let currentChunk = "";
+
+  for (const sentence of sentences) {
+    const trimmedSentence = sentence.trim();
+
+    if (
+      currentChunk &&
+      currentChunk.length + trimmedSentence.length + 1 > MAX_CHUNK_SIZE
+    ) {
+      chunks.push(currentChunk.trim());
+      currentChunk = trimmedSentence;
+    } else if (trimmedSentence.length > MAX_CHUNK_SIZE) {
+      if (currentChunk) {
+        chunks.push(currentChunk.trim());
+        currentChunk = "";
+      }
+
+      const words = trimmedSentence.split(" ");
+      let longChunk = "";
+
+      for (const word of words) {
+        if ((longChunk + word).length > MAX_CHUNK_SIZE) {
+          if (longChunk) {
+            chunks.push(longChunk.trim());
+          }
+          longChunk = word + " ";
+        } else {
+          longChunk += word + " ";
+        }
+      }
+
+      if (longChunk) {
+        currentChunk = longChunk;
+      }
+    } else {
+      currentChunk += (currentChunk ? " " : "") + trimmedSentence;
+    }
+  }
+
+  if (currentChunk) {
+    chunks.push(currentChunk.trim());
+  }
+
+  return chunks.length > 0 ? chunks : [text];
+}
+
+/**
  * Translate text using the Google Translate API.
  *
  * @param {string} text - The text to translate.
@@ -203,12 +262,7 @@ export async function translateText(
   targetLang: string
 ): Promise<string> {
   try {
-    const chunkSize = 500;
-    const chunks: string[] = [];
-
-    for (let i = 0; i < text.length; i += chunkSize) {
-      chunks.push(text.substring(i, i + chunkSize));
-    }
+    const chunks = smartChunkText(text);
 
     const translatedChunks: string[] = [];
 

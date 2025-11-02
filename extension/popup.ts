@@ -10,15 +10,15 @@ const transcriptContent = getElement("#transcript-content", HTMLDivElement);
 
 const languageSelect = getElement("#language-select", HTMLSelectElement);
 
-const enhanceWithAIButton = getElement("#enhance-with-ai", HTMLButtonElement);
-const enhancedResultContainer = getElement("#enhanced-result", HTMLDivElement);
-const enhancedTranscriptContent = getElement(
-  "#enhanced-transcript-content",
-  HTMLDivElement
-);
+// const enhanceWithAIButton = getElement("#enhance-with-ai", HTMLButtonElement);
+// const enhancedResultContainer = getElement("#enhanced-result", HTMLDivElement);
+// const enhancedTranscriptContent = getElement(
+//   "#enhanced-transcript-content",
+//   HTMLDivElement
+// );
 
 const statusElement = getElement("#status", HTMLDivElement);
-const enhancedStatusElement = getElement("#enhanced-status", HTMLDivElement);
+// const enhancedStatusElement = getElement("#enhanced-status", HTMLDivElement);
 
 chrome.storage.sync.get(["targetLanguage"], (result) => {
   if (result.targetLanguage) {
@@ -73,48 +73,48 @@ transcriptButton.addEventListener("click", async () => {
 
     transcriptContent.textContent = translatedText;
     resultContainer.classList.remove("hidden");
-    enhanceWithAIButton.classList.remove("hidden");
     setStatus(statusElement, "success", "Translation complete!");
+    // enhanceWithAIButton.classList.remove("hidden");
 
-    const enhanceResponse: TranscriptResponse = await chrome.tabs.sendMessage(
-      tab.id,
-      {
-        action: "enhanceTranscript",
-        transcript: translatedText,
-      }
-    );
-    setStatus(enhancedStatusElement, "info", "Enhancing transcript with AI...");
+    // const enhanceResponse: TranscriptResponse = await chrome.tabs.sendMessage(
+    //   tab.id,
+    //   {
+    //     action: "enhanceTranscript",
+    //     transcript: translatedText,
+    //   }
+    // );
+    // setStatus(enhancedStatusElement, "info", "Enhancing transcript with AI...");
 
-    if (!enhanceResponse.success) {
-      throw new Error(enhanceResponse.error || "Failed to enhance transcript");
-    }
+    // if (!enhanceResponse.success) {
+    //   throw new Error(enhanceResponse.error || "Failed to enhance transcript");
+    // }
 
-    console.log(
-      "%cEnhanced transcript:",
-      "background-color: green; color: white",
-      enhanceResponse.transcript
-    );
-    enhancedTranscriptContent.textContent = enhanceResponse.transcript;
-    enhancedResultContainer.classList.remove("hidden");
-    setStatus(enhancedStatusElement, "success", "Enhancement complete!");
+    // console.log(
+    //   "%cEnhanced transcript:",
+    //   "background-color: green; color: white",
+    //   enhanceResponse.transcript
+    // );
+    // enhancedTranscriptContent.textContent = enhanceResponse.transcript;
+    // enhancedResultContainer.classList.remove("hidden");
+    // setStatus(enhancedStatusElement, "success", "Enhancement complete!");
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
     setStatus(statusElement, "error", errorMessage);
   } finally {
     transcriptButton.disabled = false;
-    enhanceWithAIButton.disabled = false;
+    // enhanceWithAIButton.disabled = false;
   }
 });
 
-enhanceWithAIButton.addEventListener("click", async () => {
-  try {
-    setStatus(enhancedStatusElement, "info", "Enhancing transcript with AI...");
-    enhanceWithAIButton.disabled = true;
-    resultContainer.classList.add("hidden");
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    setStatus(enhancedStatusElement, "error", errorMessage);
-  }
-});
+// enhanceWithAIButton.addEventListener("click", async () => {
+//   try {
+//     setStatus(enhancedStatusElement, "info", "Enhancing transcript with AI...");
+//     enhanceWithAIButton.disabled = true;
+//     resultContainer.classList.add("hidden");
+//   } catch (error) {
+//     const errorMessage =
+//       error instanceof Error ? error.message : "An unknown error occurred";
+//     setStatus(enhancedStatusElement, "error", errorMessage);
+//   }
+// });
